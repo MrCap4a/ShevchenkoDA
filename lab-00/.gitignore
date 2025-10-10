@@ -1,0 +1,7 @@
+*
+
+!.gitignore             
+!app/src/main/kotlin/org/example/App.kt
+!report/
+!report.pdf
+!report.md
