@@ -7,56 +7,58 @@ import org.knowm.xchart.SwingWrapper
 import org.knowm.xchart.XYChartBuilder
 import org.knowm.xchart.style.markers.None
 
-// ---------- SEARCH ALGORITHMS ----------
+// ---------- АЛГОРИТМЫ ПОИСКА ----------
 
 /**
- * Linear search — O(n)
- * Sequentially checks every element until the target is found.
+ * Линейный поиск — O(n)
+ * Последовательно проверяет каждый элемент до нахождения цели.
  */
 fun linearSearch(list: List<Int>, target: Int): Long {
     val time = measureNanoTime {
+        // Перебор всех элементов: O(n)
         for (index in 0 until list.size) {
-            if (list[index] == target) break
+            if (list[index] == target) break // В среднем O(n/2), в худшем O(n)
         }
     }
     return time
 }
 
 /**
- * Binary search — O(log n)
- * Works only on sorted lists; halves the search range each iteration.
+ * Бинарный поиск — O(log n)
+ * Работает только на отсортированных списках; на каждом шаге делит диапазон поиска пополам.
  */
 fun binarySearch(list: List<Int>, target: Int): Long {
     val time = measureNanoTime {
         var low = 0
         var high = list.size - 1
+        // Цикл выполняется максимум log2(n) раз: O(log n)
         while (low <= high) {
             val mid = (low + high) / 2
             when {
-                list[mid] == target -> return@measureNanoTime
-                list[mid] > target -> high = mid - 1
-                else -> low = mid + 1
+                list[mid] == target -> return@measureNanoTime // Найдено, выход
+                list[mid] > target -> high = mid - 1 // Сужаем верхнюю границу
+                else -> low = mid + 1 // Сужаем нижнюю границу
             }
         }
     }
     return time
 }
 
-// ---------- APPROXIMATION HELPERS ----------
+// ---------- ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ДЛЯ АППРОКСИМАЦИИ ----------
 
-// Linear regression (y = a*x + b)
+// Линейная регрессия (y = a*x + b) — O(n)
 fun linearRegression(x: List<Double>, y: List<Double>): Pair<Double, Double> {
-    val meanX = x.average()
-    val meanY = y.average()
-    val a = (x.zip(y).sumOf { (xi, yi) -> (xi - meanX) * (yi - meanY) }) /
-            (x.sumOf { (it - meanX) * (it - meanX) })
+    val meanX = x.average() // O(n)
+    val meanY = y.average() // O(n)
+    val a = (x.zip(y).sumOf { (xi, yi) -> (xi - meanX) * (yi - meanY) }) / // O(n)
+            (x.sumOf { (it - meanX) * (it - meanX) }) // O(n)
     val b = meanY - a * meanX
     return Pair(a, b)
 }
 
-// Regression for log-based function (y = a*log2(x) + b)
+// Регрессия для функции вида y = a*log2(x) + b — O(n)
 fun logRegression(x: List<Double>, y: List<Double>): Pair<Double, Double> {
-    val logX = x.map { log2(it) }
+    val logX = x.map { log2(it) } // O(n)
     return linearRegression(logX, y)
 }
 
@@ -72,9 +74,9 @@ fun main() {
         var binaryTime = 0L
 
         repeat(80) { iteration ->
-            val list = MutableList(size) { Random.nextInt(-100_000_000, 100_000_000) }
-            val sortedList = list.sorted()
-            val target = list.random()
+            val list = MutableList(size) { Random.nextInt(-100_000_000, 100_000_000) } // O(n)
+            val sortedList = list.sorted() // O(n log n)
+            val target = list.random() // O(1)
 
             val linearResult = linearSearch(list, target)
             val binaryResult = binarySearch(sortedList, target)
@@ -146,10 +148,10 @@ fun main() {
     for (size in bigSizes) {
         var totalTime = 0L
         repeat(30) { iteration ->
-            val list = MutableList(size) { Random.nextInt(-1_000_000_000, 1_000_000_000) }.sorted()
-            val target = list.random()
+            val list = MutableList(size) { Random.nextInt(-1_000_000_000, 1_000_000_000) }.sorted() // O(n log n)
+            val target = list.random() // O(1)
             val time = binarySearch(list, target)
-            if (iteration >= 15) totalTime += time
+            if (iteration >= 15) totalTime += time // skip warm-up
         }
         val avgTime = totalTime / 15
         binaryResultsLarge.add(avgTime)
